@@ -17,7 +17,8 @@ func UserHandlerGetAll(ctx *fiber.Ctx) error {
 
 	if result.Error != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": result.Error,
+			"message": result.Error,
+			"data":    nil,
 		})
 	}
 
@@ -30,7 +31,8 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 
 	if err := ctx.BodyParser(&user); err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": err,
+			"message": err,
+			"data":    nil,
 		})
 	}
 
@@ -47,7 +49,8 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 
 	if err := request.ValidateUserCreateRequest(&user); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
-			"error": err.Error(), // Mengembalikan pesan kesalahan validasi
+			"message": err.Error(), // Mengembalikan pesan kesalahan validasi
+			"data":    nil,
 		})
 	}
 
@@ -63,7 +66,8 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 
 	if result.Error != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": result.Error,
+			"message": result.Error,
+			"data":    nil,
 		})
 	}
 
@@ -105,7 +109,8 @@ func UserHandlerUpdate(ctx *fiber.Ctx) error {
 	userRequest := new(request.UserUpdateRequest)
 	if err := ctx.BodyParser(userRequest); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
-			"error": "bad request",
+			"message": "bad request",
+			"data":    nil,
 		})
 	}
 
@@ -132,7 +137,8 @@ func UserHandlerUpdate(ctx *fiber.Ctx) error {
 
 	if result.Error != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": result.Error,
+			"message": result.Error,
+			"data":    nil,
 		})
 	}
 
@@ -146,7 +152,8 @@ func UserHandlerUpdateEmail(ctx *fiber.Ctx) error {
 	userRequest := new(request.UserEmailRequest)
 	if err := ctx.BodyParser(userRequest); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
-			"error": "bad request",
+			"message": "bad request",
+			"data":    nil,
 		})
 	}
 
@@ -180,7 +187,8 @@ func UserHandlerUpdateEmail(ctx *fiber.Ctx) error {
 
 	if result.Error != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": result.Error,
+			"message": result.Error,
+			"data":    nil,
 		})
 	}
 
@@ -205,7 +213,8 @@ func UserHandlerDelete(ctx *fiber.Ctx) error {
 
 	if result.Error != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": result.Error,
+			"message": result.Error,
+			"data":    nil,
 		})
 	}
 

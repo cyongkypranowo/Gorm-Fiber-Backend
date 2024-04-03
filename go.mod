@@ -14,6 +14,7 @@ require (
 	github.com/gofiber/fiber v1.14.6 // indirect
 	github.com/gofiber/fiber/v2 v2.52.4 // indirect
 	github.com/gofiber/utils v0.0.10 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/gorilla/schema v1.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

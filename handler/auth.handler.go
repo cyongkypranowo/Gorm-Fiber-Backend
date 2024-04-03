@@ -5,8 +5,10 @@ import (
 	"go-fiber-gorm/model/entity"
 	"go-fiber-gorm/model/request"
 	"go-fiber-gorm/utils"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func LoginHandler(ctx *fiber.Ctx) error {
@@ -44,12 +46,22 @@ func LoginHandler(ctx *fiber.Ctx) error {
 		})
 	}
 
-	return ctx.JSON(fiber.Map{
+	//Generate Token
+	claims := jwt.MapClaims{}
+	claims["name"] = user.Name
+	claims["email"] = user.Email
+	claims["exp"] = time.Now().Add(time.Minute * 2).Unix()
+
+	token, err := utils.GenerateToken(&claims)
+	if err != nil {
+		return ctx.Status(500).JSON(fiber.Map{
+			"message": err.Error(),
+			"data":    nil,
+		})
+	}
+	return ctx.Status(200).JSON(fiber.Map{
 		"message": "login success",
-		"data": fiber.Map{
-			"token": "secret",
-			"user":  user,
-		},
+		"data":    token,
 	})
 
 }

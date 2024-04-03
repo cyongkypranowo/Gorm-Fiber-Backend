@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"go-fiber-gorm/utils"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -28,9 +29,10 @@ func Auth(ctx *fiber.Ctx) error {
 	token := parts[1]
 
 	// Periksa apakah token sesuai dengan nilai yang diharapkan
-	if token != "secret" {
+	_, err := utils.VerifyToken(token)
+	if err != nil {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "unauthorized",
+			"message": "Token is not valid",
 		})
 	}
 

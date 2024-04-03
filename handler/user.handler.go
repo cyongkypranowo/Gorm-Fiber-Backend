@@ -17,13 +17,12 @@ func UserHandlerGetAll(ctx *fiber.Ctx) error {
 	result := database.DB.Debug().Find(&users)
 
 	if result.Error != nil {
-		return ctx.Status(500).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": result.Error,
-			"data":    nil,
 		})
 	}
 
-	return ctx.Status(200).JSON(users)
+	return ctx.Status(fiber.StatusOK).JSON(users)
 }
 
 func UserHandlerCreate(ctx *fiber.Ctx) error {
@@ -31,9 +30,8 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 	var user request.UserCreateRequest
 
 	if err := ctx.BodyParser(&user); err != nil {
-		return ctx.Status(500).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err,
-			"data":    nil,
 		})
 	}
 
@@ -42,16 +40,15 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 	database.DB.Unscoped().Where("email =?", user.Email).First(&userExist)
 
 	if userExist.ID != 0 {
-		return ctx.Status(409).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusConflict).JSON(fiber.Map{
 			"message": "email already exist",
-			"data":    nil,
 		})
 	}
 
 	if err := request.ValidateUserCreateRequest(&user); err != nil {
-		return ctx.Status(400).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": err.Error(), // Mengembalikan pesan kesalahan validasi
-			"data":    nil,
+
 		})
 	}
 
@@ -68,7 +65,6 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Internal Server Error",
-			"data":    nil,
 		})
 	}
 
@@ -77,13 +73,12 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 	result := database.DB.Debug().Create(&newUser)
 
 	if result.Error != nil {
-		return ctx.Status(500).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": result.Error,
-			"data":    nil,
 		})
 	}
 
-	return ctx.Status(200).JSON(fiber.Map{
+	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "user created",
 		"data":    newUser,
 	})
@@ -95,9 +90,8 @@ func UserHandlerGetById(ctx *fiber.Ctx) error {
 	var user entity.User
 	err := database.DB.First(&user, "id=?", userId).Error
 	if err != nil {
-		return ctx.Status(404).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "user not found",
-			"data":    nil,
 		})
 	}
 
@@ -111,7 +105,7 @@ func UserHandlerGetById(ctx *fiber.Ctx) error {
 		UpdatedAt: user.UpdatedAt,
 	}
 
-	return ctx.Status(200).JSON(fiber.Map{
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",
 		"data":    userResponse,
 	})
@@ -120,9 +114,8 @@ func UserHandlerGetById(ctx *fiber.Ctx) error {
 func UserHandlerUpdate(ctx *fiber.Ctx) error {
 	userRequest := new(request.UserUpdateRequest)
 	if err := ctx.BodyParser(userRequest); err != nil {
-		return ctx.Status(400).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "bad request",
-			"data":    nil,
 		})
 	}
 
@@ -132,9 +125,8 @@ func UserHandlerUpdate(ctx *fiber.Ctx) error {
 
 	err := database.DB.First(&user, "id=?", userId).Error
 	if err != nil {
-		return ctx.Status(404).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "user not found",
-			"data":    nil,
 		})
 	}
 
@@ -148,13 +140,12 @@ func UserHandlerUpdate(ctx *fiber.Ctx) error {
 	result := database.DB.Debug().Model(&user).Updates(user)
 
 	if result.Error != nil {
-		return ctx.Status(500).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": result.Error,
-			"data":    nil,
 		})
 	}
 
-	return ctx.Status(200).JSON(fiber.Map{
+	return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 		"message": "user updated",
 		"data":    user,
 	})
@@ -163,9 +154,8 @@ func UserHandlerUpdate(ctx *fiber.Ctx) error {
 func UserHandlerUpdateEmail(ctx *fiber.Ctx) error {
 	userRequest := new(request.UserEmailRequest)
 	if err := ctx.BodyParser(userRequest); err != nil {
-		return ctx.Status(400).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "bad request",
-			"data":    nil,
 		})
 	}
 
@@ -175,9 +165,8 @@ func UserHandlerUpdateEmail(ctx *fiber.Ctx) error {
 
 	err := database.DB.First(&user, "id=?", userId).Error
 	if err != nil {
-		return ctx.Status(404).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "user not found",
-			"data":    nil,
 		})
 	}
 
@@ -186,9 +175,8 @@ func UserHandlerUpdateEmail(ctx *fiber.Ctx) error {
 	database.DB.Unscoped().Where("email =?", userRequest.Email).First(&userExist)
 
 	if userExist.ID != 0 {
-		return ctx.Status(409).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusConflict).JSON(fiber.Map{
 			"message": "email already exist",
-			"data":    nil,
 		})
 	}
 
@@ -198,13 +186,12 @@ func UserHandlerUpdateEmail(ctx *fiber.Ctx) error {
 	result := database.DB.Debug().Model(&user).Updates(user)
 
 	if result.Error != nil {
-		return ctx.Status(500).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": result.Error,
-			"data":    nil,
 		})
 	}
 
-	return ctx.Status(200).JSON(fiber.Map{
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "user updated",
 		"data":    user,
 	})
@@ -215,24 +202,21 @@ func UserHandlerDelete(ctx *fiber.Ctx) error {
 	var user entity.User
 	err := database.DB.First(&user, "id=?", userId).Error
 	if err != nil {
-		return ctx.Status(404).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "user not found",
-			"data":    nil,
 		})
 	}
 
 	result := database.DB.Debug().Delete(&user)
 
 	if result.Error != nil {
-		return ctx.Status(500).JSON(fiber.Map{
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": result.Error,
-			"data":    nil,
 		})
 	}
 
-	return ctx.Status(200).JSON(fiber.Map{
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "user deleted",
-		"data":    nil,
 	})
 
 }

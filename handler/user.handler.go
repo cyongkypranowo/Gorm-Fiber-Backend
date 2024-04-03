@@ -5,6 +5,7 @@ import (
 	"go-fiber-gorm/model/entity"
 	"go-fiber-gorm/model/request"
 	"go-fiber-gorm/model/response"
+	"go-fiber-gorm/utils"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -62,6 +63,17 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 		Phone:   user.Phone,
 	}
 
+	hashPassword, err := utils.HashString(user.Password)
+
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Internal Server Error",
+			"data":    nil,
+		})
+	}
+
+	newUser.Password = hashPassword
+
 	result := database.DB.Debug().Create(&newUser)
 
 	if result.Error != nil {
@@ -73,7 +85,7 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 
 	return ctx.Status(200).JSON(fiber.Map{
 		"message": "user created",
-		"data":    user,
+		"data":    newUser,
 	})
 }
 

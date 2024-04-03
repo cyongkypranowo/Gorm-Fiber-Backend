@@ -1,14 +1,13 @@
 package request
 
-import (
-	"go-fiber-gorm/util"
-)
+import "go-fiber-gorm/utils"
 
 type UserCreateRequest struct {
-	Name    string `json:"name" validate:"required"`
-	Email   string `json:"email" validate:"email"`
-	Address string `json:"address"`
-	Phone   string `json:"phone"`
+	Name     string `json:"name" validate:"required"`
+	Email    string `json:"email" validate:"email"`
+	Password string `json:"password" validate:"required,min=6"`
+	Address  string `json:"address"`
+	Phone    string `json:"phone"`
 }
 
 type UserUpdateRequest struct {
@@ -22,5 +21,5 @@ type UserEmailRequest struct {
 }
 
 func ValidateUserCreateRequest(r *UserCreateRequest) error {
-	return util.Validate.Struct(r)
+	return utils.Validate.Struct(r)
 }

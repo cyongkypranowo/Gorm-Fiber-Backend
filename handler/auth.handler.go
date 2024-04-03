@@ -4,6 +4,7 @@ import (
 	"go-fiber-gorm/database"
 	"go-fiber-gorm/model/entity"
 	"go-fiber-gorm/model/request"
+	"go-fiber-gorm/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -28,6 +29,15 @@ func LoginHandler(ctx *fiber.Ctx) error {
 	var user entity.User
 	err := database.DB.First(&user, "email=?", loginRequest.Email).Error
 	if err != nil {
+		return ctx.Status(404).JSON(fiber.Map{
+			"message": "wrong credentials",
+			"data":    nil,
+		})
+	}
+
+	// Check Validation Password
+	isValid := utils.CheckPasswordHash(loginRequest.Password, user.Password)
+	if !isValid {
 		return ctx.Status(404).JSON(fiber.Map{
 			"message": "wrong credentials",
 			"data":    nil,

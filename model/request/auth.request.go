@@ -1,6 +1,6 @@
 package request
 
-import "go-fiber-gorm/util"
+import "go-fiber-gorm/utils"
 
 type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`
@@ -8,5 +8,5 @@ type LoginRequest struct {
 }
 
 func ValidateLoginRequest(r *LoginRequest) error {
-	return util.Validate.Struct(r)
+	return utils.Validate.Struct(r)
 }

@@ -29,12 +29,23 @@ func Auth(ctx *fiber.Ctx) error {
 	token := parts[1]
 
 	// Periksa apakah token sesuai dengan nilai yang diharapkan
-	_, err := utils.VerifyToken(token)
+	claims, err := utils.DecodeToken(token)
+
 	if err != nil {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "Token is not valid",
+			"message": "unauthorized",
 		})
 	}
+
+	// Check Role and validate
+	role := claims["role"].(string)
+	if role != "admin" {
+		return ctx.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"message": "forbidden",
+		})
+	}
+
+	ctx.Locals("session", claims)
 
 	// Lanjutkan ke handler berikutnya jika token valid
 	return ctx.Next()

@@ -48,6 +48,7 @@ func LoginHandler(ctx *fiber.Ctx) error {
 	claims["name"] = user.Name
 	claims["email"] = user.Email
 	claims["exp"] = time.Now().Add(time.Minute * 2).Unix()
+	claims["role"] = "admin"
 
 	token, err := utils.GenerateToken(&claims)
 	if err != nil {

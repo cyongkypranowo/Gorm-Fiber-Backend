@@ -7,9 +7,12 @@ import (
 	"path/filepath"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 const defaultPathAssetImage = "./public/uploads"
+
+var fGenerator = uuid.New().String()
 
 func HandleSingleFile(ctx *fiber.Ctx) error {
 	// Handle File
@@ -21,12 +24,12 @@ func HandleSingleFile(ctx *fiber.Ctx) error {
 	var filename string
 
 	// Get Path file
-	path := getPathAsset(filename)
+	path, ext := getPathAsset(filename)
 	if path == "" {
 		log.Println("file not found")
 		return nil
 	}
-	path = defaultPathAssetImage + "/" + path + "/" + filename
+	path = defaultPathAssetImage + "/" + path + "/" + fGenerator + ext
 
 	if file != nil {
 		filename = file.Filename
@@ -57,12 +60,12 @@ func HandleMultipleFile(ctx *fiber.Ctx) error {
 		if file != nil {
 			filename = fmt.Sprintf("%d-%v", i, file.Filename) // Handle jika nama file sama, akan di tambahkan menggunakan index
 			// Get Path file
-			path := getPathAsset(filename)
+			path, ext := getPathAsset(filename)
 			if path == "" {
 				log.Println("file not found")
 				return nil
 			}
-			path = defaultPathAssetImage + "/" + path + "/" + filename
+			path = defaultPathAssetImage + "/" + path + "/" + fGenerator + ext
 			errSaveFile := ctx.SaveFile(file, path)
 			if errSaveFile != nil {
 				log.Println("Fail to save file into public/uploads directory: ", errSaveFile)
@@ -83,13 +86,13 @@ func HandleMultipleFile(ctx *fiber.Ctx) error {
 
 func HandleRemoveFile(filename string) error {
 
-	path := getPathAsset(filename)
+	path, ext := getPathAsset(filename)
 	if path == "" {
 		log.Println("file not found")
 		return nil
 	}
 
-	path = defaultPathAssetImage + "/" + path + "/" + filename
+	path = defaultPathAssetImage + "/" + path + "/" + fGenerator + ext
 
 	err := os.Remove(path)
 	if err != nil {
@@ -100,9 +103,9 @@ func HandleRemoveFile(filename string) error {
 	return nil
 }
 
-func getPathAsset(filename string) string {
+func getPathAsset(filename string) (string, string) {
 	if filename == "" {
-		return ""
+		return "", ""
 	}
 
 	// get ext of filename
@@ -121,5 +124,5 @@ func getPathAsset(filename string) string {
 		path = "miscellaneous" // Jika ekstensi tidak dikenali
 	}
 
-	return path
+	return path, ext
 }

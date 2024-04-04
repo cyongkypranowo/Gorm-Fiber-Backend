@@ -12,87 +12,98 @@ import (
 
 const defaultPathAssetImage = "./public/uploads"
 
-var fGenerator = uuid.New().String()
+func HandleSingleFile(module_name string) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		// Handle File
+		file, errFile := ctx.FormFile("file")
 
-func HandleSingleFile(ctx *fiber.Ctx) error {
-	// Handle File
-	file, errFile := ctx.FormFile("file")
-	if errFile != nil {
-		log.Println("Error:", errFile.Error())
-	}
-
-	var filename string
-
-	// Get Path file
-	path, ext := getPathAsset(filename)
-	if path == "" {
-		log.Println("file not found")
-		return nil
-	}
-	path = defaultPathAssetImage + "/" + path + "/" + fGenerator + ext
-
-	if file != nil {
-		filename = file.Filename
-		errSaveFile := ctx.SaveFile(file, path)
-		if errSaveFile != nil {
-			log.Println("Fail to save file: ", errSaveFile)
+		if errFile != nil {
+			log.Println("Error:", errFile.Error())
 		}
-	} else {
-		log.Println("Nothing to save")
-	}
 
-	ctx.Locals("filename", filename)
-	return ctx.Next()
-}
-
-func HandleMultipleFile(ctx *fiber.Ctx) error {
-	// Handle File
-	form, errFile := ctx.MultipartForm()
-	if errFile != nil {
-		log.Println("Error:", errFile.Error())
-	}
-
-	files := form.File["files"]
-	var filenames []string
-
-	for i, file := range files {
 		var filename string
+
 		if file != nil {
-			filename = fmt.Sprintf("%d-%v", i, file.Filename) // Handle jika nama file sama, akan di tambahkan menggunakan index
+			filename = file.Filename
 			// Get Path file
 			path, ext := getPathAsset(filename)
 			if path == "" {
 				log.Println("file not found")
 				return nil
 			}
-			path = defaultPathAssetImage + "/" + path + "/" + fGenerator + ext
+
+			// generate filename
+			fGenerator := uuid.New().String()
+
+			path = defaultPathAssetImage + "/" + path + "/" + module_name + "_" + fGenerator + ext
 			errSaveFile := ctx.SaveFile(file, path)
 			if errSaveFile != nil {
-				log.Println("Fail to save file into public/uploads directory: ", errSaveFile)
+				log.Println("Fail to save file: ", errSaveFile)
 			}
 		} else {
-			log.Println("Nothing file to uploading")
+			log.Println("Nothing to save")
 		}
 
-		if filename != "" {
-			filenames = append(filenames, filename)
-		}
+		ctx.Locals("filename", filename)
+		return ctx.Next()
 	}
+}
 
-	ctx.Locals("files", filenames)
+func HandleMultipleFile(module_name string) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		// Handle File
+		form, errFile := ctx.MultipartForm()
+		if errFile != nil {
+			log.Println("Error:", errFile.Error())
+			return errFile
+		}
 
-	return ctx.Next()
+		files := form.File["files"]
+		var filenames []string
+
+		for _, file := range files {
+			var filename string
+			if file != nil {
+				filename = file.Filename
+				// Get Path file
+				path, ext := getPathAsset(filename)
+				if path == "" {
+					log.Println("file not found")
+					return nil
+				}
+
+				// generate filename
+				fGenerator := uuid.New().String()
+
+				path = defaultPathAssetImage + "/" + path + "/" + module_name + "_" + fGenerator + ext
+				errSaveFile := ctx.SaveFile(file, path)
+				if errSaveFile != nil {
+					log.Println("Fail to save file into public/uploads directory: ", errSaveFile)
+				}
+			} else {
+				log.Println("Nothing file to uploading")
+			}
+
+			if filename != "" {
+				filenames = append(filenames, filename)
+			}
+		}
+
+		ctx.Locals("files", filenames)
+
+		return ctx.Next()
+	}
 }
 
 func HandleRemoveFile(filename string) error {
 
-	path, ext := getPathAsset(filename)
+	path, _ := getPathAsset(filename)
 	if path == "" {
 		log.Println("file not found")
 		return nil
 	}
 
-	path = defaultPathAssetImage + "/" + path + "/" + fGenerator + ext
+	path = defaultPathAssetImage + "/" + path + "/" + filename
 
 	err := os.Remove(path)
 	if err != nil {
@@ -104,6 +115,7 @@ func HandleRemoveFile(filename string) error {
 }
 
 func getPathAsset(filename string) (string, string) {
+	fmt.Println(filename)
 	if filename == "" {
 		return "", ""
 	}

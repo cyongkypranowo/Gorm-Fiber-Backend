@@ -18,7 +18,6 @@ public/uploads/images/*
 public/uploads/videos/*
 public/uploads/musics/*
 public/uploads/documents/*
-tmp/*
 
 # Dependency directories (remove the comment below to include it)
 # vendor/

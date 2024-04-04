@@ -63,7 +63,7 @@ func PhotoHandlerCreate(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "photo created",
+		"message": "photo uploaded successfully",
 		"data":    "berhasil",
 	})
 }

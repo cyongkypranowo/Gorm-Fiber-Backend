@@ -21,8 +21,8 @@ func RouteInit(r *fiber.App) {
 	r.Put("/user/:id/update-email", middleware.Auth, handler.UserHandlerUpdateEmail)
 	r.Delete("/user/:id", middleware.Auth, handler.UserHandlerDelete)
 
-	r.Post("/book", utils.HandleSingleFile, handler.BookHandlerCreate)
+	r.Post("/book", utils.HandleSingleFile("Book"), handler.BookHandlerCreate)
 
-	r.Post("/photo", utils.HandleMultipleFile, handler.PhotoHandlerCreate)
+	r.Post("/photo", utils.HandleMultipleFile("Photo"), handler.PhotoHandlerCreate)
 
 }

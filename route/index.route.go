@@ -4,6 +4,7 @@ import (
 	"go-fiber-gorm/config"
 	"go-fiber-gorm/handler"
 	"go-fiber-gorm/middleware"
+	"go-fiber-gorm/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,6 +21,6 @@ func RouteInit(r *fiber.App) {
 	r.Put("/user/:id/update-email", middleware.Auth, handler.UserHandlerUpdateEmail)
 	r.Delete("/user/:id", middleware.Auth, handler.UserHandlerDelete)
 
-	r.Post("/book", handler.BookHandlerCreate)
+	r.Post("/book", utils.HandleSingleFile, handler.BookHandlerCreate)
 
 }
